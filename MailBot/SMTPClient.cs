@@ -58,7 +58,11 @@ namespace MailBot
         private void Ic_NewMessage(object sender, AE.Net.Mail.Imap.MessageEventArgs e)
         {
             //Check the message and send a reply
-            if (ic == null) ic = new ImapClient("imap.gmail.com", username, password, AuthMethods.Login, 993, true);
+            if (ic == null)
+            {
+                ic = new ImapClient("imap.gmail.com", username, password, AuthMethods.Login, 993, true);
+                ic.NewMessage += Ic_NewMessage;
+            }
             AE.Net.Mail.MailMessage msg = ic.GetMessage(e.MessageCount - 1);   //Get the newest email
 
             switch (msg.Subject)
@@ -91,7 +95,7 @@ namespace MailBot
                     break;
             }
 
-
+            ic.DeleteMessage(msg);
         }
     }
 }

@@ -10,11 +10,16 @@ namespace MailBot
     {
         static void Main(string[] args)
         {
-            SMTPSys s = new SMTPSys(args[0], args[1]);
-
-            if(PlatformInfo.RunningPlatform() == Platform.Linux)
+            if (args.Length < 4)
             {
-                LinuxMouseController.MoveCursor(100, 100);
+                Console.WriteLine("Arguments [client/server] [(Shared Edge):top/bottom/left/right] [gmail username]@gmail.com [gmail password]");
+            }
+
+            SMTPSys s = new SMTPSys(args[2], args[3]);
+
+            if (PlatformInfo.RunningPlatform() == Platform.Linux)
+            {
+                LinuxController.MoveCursor(100, 100);
             }
         }
     }
