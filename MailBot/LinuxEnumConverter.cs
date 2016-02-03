@@ -19,10 +19,12 @@ namespace MailBot
                     return XMouseButton.Button2;
                 case MouseButtons.Right:
                     return XMouseButton.Button3;
-                case MouseButtons.Button4:
-                    return XMouseButton.Button4;
-                case MouseButtons.Scroll:
+                case MouseButtons.ScrollDown:
                     return XMouseButton.Button5;
+                case MouseButtons.ScrollUp:
+                    return XMouseButton.Button4;
+                case MouseButtons.Back:
+                    return (XMouseButton)8;
             }
 
             return XMouseButton.AnyButton;

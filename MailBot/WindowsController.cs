@@ -21,7 +21,10 @@ namespace MailBot
             Move = 0x00000001,
             Absolute = 0x00008000,
             RightDown = 0x00000008,
-            RightUp = 0x00000010
+            RightUp = 0x00000010,
+            Wheel = 0x800,
+            XDown = 0x80,
+            XUp = 0x100
         }
 
         [DllImport("user32.dll", EntryPoint = "SetCursorPos")]
@@ -56,7 +59,7 @@ namespace MailBot
             return currentMousePoint;
         }
 
-        private static void MouseEvent(MouseEventFlags value)
+        private static void MouseEvent(MouseEventFlags value, int data = 0)
         {
             Point position = GetCursorPosition();
 
@@ -64,7 +67,7 @@ namespace MailBot
                 ((int)value,
                  position.X,
                  position.Y,
-                 0,
+                 data,
                  0)
                 ;
         }
@@ -101,6 +104,10 @@ namespace MailBot
             else if (b == MouseButtons.Middle && !down) MouseEvent(MouseEventFlags.MiddleUp);
             else if (b == MouseButtons.Right && down) MouseEvent(MouseEventFlags.RightDown);
             else if (b == MouseButtons.Right && !down) MouseEvent(MouseEventFlags.RightUp);
+            else if (b == MouseButtons.Back && down) MouseEvent(MouseEventFlags.XDown, 1);
+            else if (b == MouseButtons.Back && !down) MouseEvent(MouseEventFlags.XUp, 1);
+            else if (b == MouseButtons.ScrollUp) MouseEvent(MouseEventFlags.Wheel, 1);
+            else if (b == MouseButtons.ScrollDown) MouseEvent(MouseEventFlags.Wheel, -1);
 
         }
 

@@ -16,13 +16,29 @@ namespace MailBot
         static Communicator com = null;
         static Point srcMousePos = new Point(0, 0);
         static Point dstMousePos = new Point(0, 0);
+        static Form f;
 
-        static void RegisterEvents()
+        internal static void RegisterEvents()
         {
             m_events = Hook.GlobalEvents();
             m_events.MouseDownExt += M_events_MouseDownExt;
             m_events.MouseUpExt += M_events_MouseDownExt;
             m_events.MouseMoveExt += M_events_MouseMove;
+            m_events.MouseClick += M_events_MouseClick;
+            m_events.MouseWheelExt += M_events_MouseDownExt;
+        }
+
+        private static void M_events_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (transmitMouse)
+            {
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Left)) com.SendClick(MouseButtons.Left);
+                
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Right)) com.SendClick(MouseButtons.Right);
+                
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Middle)) com.SendClick(MouseButtons.Middle);
+
+            }
         }
 
         static void M_events_MouseMove(object sender, MouseEventExtArgs e)
@@ -30,14 +46,15 @@ namespace MailBot
             if (transmitMouse)
             {
                 com.SendMove(e.X, e.Y);
-                e.Handled = true;
+                f.Location = new Point(e.X - f.Width / 2, e.Y - f.Height / 2);
             }
         }
 
         static void M_events_MouseDownExt(object sender, MouseEventExtArgs e)
         {
-            if (e.Button == (System.Windows.Forms.MouseButtons.XButton1 | System.Windows.Forms.MouseButtons.XButton2) && e.IsMouseButtonDown)
+            if (e.Button == (System.Windows.Forms.MouseButtons.XButton2) && e.IsMouseButtonDown)
             {
+                e.Handled = true;
                 transmitMouse = !transmitMouse;
                 if (transmitMouse)
                 {
@@ -57,17 +74,22 @@ namespace MailBot
             if (transmitMouse)
             {
                 e.Handled = true;
+                //if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Left) && e.Clicked) com.SendClick(MouseButtons.Left);
+                //else 
                 if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Left) && e.IsMouseButtonDown) com.SendDown(MouseButtons.Left);
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Left) && (e.IsMouseButtonUp | e.Clicked)) com.SendUp(MouseButtons.Left);
+
+                //if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Right) && e.Clicked) com.SendClick(MouseButtons.Right);
+                //else 
                 if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Right) && e.IsMouseButtonDown) com.SendDown(MouseButtons.Right);
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Right) && (e.IsMouseButtonUp | e.Clicked)) com.SendUp(MouseButtons.Right);
+
+                //if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Middle) && e.Clicked) com.SendClick(MouseButtons.Middle);
+                //else 
                 if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Middle) && e.IsMouseButtonDown) com.SendDown(MouseButtons.Middle);
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Middle) && (e.IsMouseButtonUp | e.Clicked)) com.SendUp(MouseButtons.Middle);
 
-                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Left) && e.IsMouseButtonUp) com.SendUp(MouseButtons.Left);
-                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Right) && e.IsMouseButtonUp) com.SendUp(MouseButtons.Right);
-                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Middle) && e.IsMouseButtonUp) com.SendUp(MouseButtons.Middle);
 
-                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Left) && e.Clicked) com.SendClick(MouseButtons.Left);
-                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Right) && e.Clicked) com.SendClick(MouseButtons.Right);
-                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Middle) && e.Clicked) com.SendClick(MouseButtons.Middle);
             }
         }
 
@@ -143,6 +165,9 @@ namespace MailBot
             }
 
             com.ListenAsync();  //Start listening
+
+            f = new Form1();
+            Application.Run(f);
 
             while (true)
             {

@@ -36,6 +36,14 @@ namespace MailBot
             server.SendTo(eString(msg), targetEP);
         }
 
+        private void SendMessageAsync(string msg)
+        {
+            server.BeginSendTo(eString(msg), 0, msg.Length, SocketFlags.None, targetEP, new AsyncCallback((IAsyncResult ar) =>
+            {
+                server.EndSendTo(ar);
+            }), null);
+        }
+
         private string ReceiveMessage(out IPEndPoint ep)
         {
             IPEndPoint e = new IPEndPoint(IPAddress.Any, 0);
@@ -59,22 +67,22 @@ namespace MailBot
 
         public void SendClick(MouseButtons button)
         {
-            SendMessage($"Click:{button}");
+            SendMessageAsync($"Click:{button}");
         }
 
         public void SendMove(int x, int y)
         {
-            SendMessage($"Move: {x},{y}");
+            SendMessageAsync($"Move: {x},{y}");
         }
 
         public void SendDown(MouseButtons button)
         {
-            SendMessage($"Down:{button}");
+            SendMessageAsync($"Down:{button}");
         }
 
         public void SendUp(MouseButtons button)
         {
-            SendMessage($"Up:{button}");
+            SendMessageAsync($"Up:{button}");
         }
 
         public void ListenAsync()
