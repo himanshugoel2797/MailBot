@@ -109,12 +109,14 @@ namespace MailBot
                     try
                     {
                         server = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                        targetEP = clientEP;
+                        targetEP = new IPEndPoint(clientEP.Address, serverPort);
 
-                        int key = int.Parse(msg.Split(':')[1]);
+                        int cKey = int.Parse(msg.Split(':')[1]);
 
                         Random rng = GetIPRandom();
-                        msg = SendMessageAndWait($"Shakeback:{key},{rng.Next()}", out clientEP);
+                        int key = rng.Next();
+
+                        msg = SendMessageAndWait($"Shakeback:{cKey},{key}", out clientEP);
 
                         if (msg.StartsWith("ShakebackAccepted:"))
                         {
