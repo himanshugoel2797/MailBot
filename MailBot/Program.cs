@@ -1,13 +1,76 @@
-﻿using System;
+﻿using Gma.System.MouseKeyHook;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace MailBot
 {
     class Program
     {
+        static IKeyboardMouseEvents m_events;
+        static bool transmitMouse = false;
+        static Communicator com = null;
+        static Point srcMousePos = new Point(0, 0);
+        static Point dstMousePos = new Point(0, 0);
+
+        static void RegisterEvents()
+        {
+            m_events = Hook.GlobalEvents();
+            m_events.MouseDownExt += M_events_MouseDownExt;
+            m_events.MouseUpExt += M_events_MouseDownExt;
+            m_events.MouseMoveExt += M_events_MouseMove;
+        }
+
+        static void M_events_MouseMove(object sender, MouseEventExtArgs e)
+        {
+            if (transmitMouse)
+            {
+                com.SendMove(e.X, e.Y);
+                e.Handled = true;
+            }
+        }
+
+        static void M_events_MouseDownExt(object sender, MouseEventExtArgs e)
+        {
+            if (e.Button == (System.Windows.Forms.MouseButtons.XButton1 | System.Windows.Forms.MouseButtons.XButton2) && e.IsMouseButtonDown)
+            {
+                transmitMouse = !transmitMouse;
+                if (transmitMouse)
+                {
+                    Cursor.Hide();
+                    Controller.MoveCursor(dstMousePos.X, dstMousePos.Y);
+                    srcMousePos = e.Location;
+                }
+                else
+                {
+                    Cursor.Show();
+                    Controller.MoveCursor(srcMousePos.X, srcMousePos.Y);
+                    dstMousePos = e.Location;
+                }
+                return;
+            }
+
+            if (transmitMouse)
+            {
+                e.Handled = true;
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Left) && e.IsMouseButtonDown) com.SendDown(MouseButtons.Left);
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Right) && e.IsMouseButtonDown) com.SendDown(MouseButtons.Right);
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Middle) && e.IsMouseButtonDown) com.SendDown(MouseButtons.Middle);
+
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Left) && e.IsMouseButtonUp) com.SendUp(MouseButtons.Left);
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Right) && e.IsMouseButtonUp) com.SendUp(MouseButtons.Right);
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Middle) && e.IsMouseButtonUp) com.SendUp(MouseButtons.Middle);
+
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Left) && e.Clicked) com.SendClick(MouseButtons.Left);
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Right) && e.Clicked) com.SendClick(MouseButtons.Right);
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Middle) && e.Clicked) com.SendClick(MouseButtons.Middle);
+            }
+        }
+
         static void Main(string[] args)
         {
             if (args.Length < 3)
@@ -69,8 +132,6 @@ namespace MailBot
             }
 
             if (args[0] == "server") new SMTPSys(args[2], args[3]);
-
-            Communicator com = null;
 
             if (args[0] == "server") com = new Communicator();
             else if (args[0] == "client") com = new Communicator(args[2]);

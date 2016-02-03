@@ -67,6 +67,16 @@ namespace MailBot
             SendMessage($"Move: {x},{y}");
         }
 
+        public void SendDown(MouseButtons button)
+        {
+            SendMessage($"Down:{button}");
+        }
+
+        public void SendUp(MouseButtons button)
+        {
+            SendMessage($"Up:{button}");
+        }
+
         public void ListenAsync()
         {
             AsyncCallback callback = null;
@@ -84,6 +94,12 @@ namespace MailBot
                             case "Click":
                                 Controller.SendMouseEvent((MouseButtons)Enum.Parse(typeof(MouseButtons), msg.Split(':')[1]), true);
                                 System.Threading.Thread.Sleep(1);
+                                Controller.SendMouseEvent((MouseButtons)Enum.Parse(typeof(MouseButtons), msg.Split(':')[1]), false);
+                                break;
+                            case "Down":
+                                Controller.SendMouseEvent((MouseButtons)Enum.Parse(typeof(MouseButtons), msg.Split(':')[1]), true);
+                                break;
+                            case "Up":
                                 Controller.SendMouseEvent((MouseButtons)Enum.Parse(typeof(MouseButtons), msg.Split(':')[1]), false);
                                 break;
                             case "Move":
