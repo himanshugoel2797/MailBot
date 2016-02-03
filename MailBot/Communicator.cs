@@ -108,6 +108,9 @@ namespace MailBot
                 {
                     try
                     {
+                        server = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                        targetEP = clientEP;
+
                         int key = int.Parse(msg.Split(':')[1]);
 
                         Random rng = GetIPRandom();
