@@ -10,7 +10,7 @@ namespace MailBot
     {
         static void Main(string[] args)
         {
-            if (args.Length < 4)
+            if (args.Length < 3)
             {
                 args = new string[] { "", "", "", "" };
 

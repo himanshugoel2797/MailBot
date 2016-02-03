@@ -60,7 +60,7 @@ namespace MailBot
             client = new UdpClient(serverPort);
             IPEndPoint servEP = new IPEndPoint(IPAddress.Any, serverPort);
 
-            string resp = SendMessageAndWait("Shake", out servEP);
+            string resp = SendMessageAndWait($"Shake:{Dns.GetHostAddresses(Dns.GetHostName())[0]}", out servEP);
 
         }
 
@@ -71,7 +71,11 @@ namespace MailBot
             IPEndPoint clientEP = new IPEndPoint(IPAddress.Any, clientPort);
 
             string msg = ReceiveMessage(out clientEP);
-            Console.WriteLine(msg);
+            if (msg.StartsWith("Shake"))
+            {
+                msg = msg.Replace("Shake:", string.Empty);
+                if (IPAddress.Parse(msg) != clientEP.Address) Console.WriteLine("Bad handshake");
+            }
         }
 
     }
