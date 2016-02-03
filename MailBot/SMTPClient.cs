@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using AE.Net.Mail;
 using System.Net;
 using System.Net.Mail;
+using System.Threading;
+using System.Diagnostics;
 
 namespace MailBot
 {
@@ -82,13 +84,19 @@ namespace MailBot
                         SendMessage(body, msg.From.Address);
                     }
                     break;
+			case "Reset":
+				{
+					Process.Start (System.Reflection.Assembly.GetExecutingAssembly ().Location);
+					Environment.Exit (0);
+				}
+				break;
                 case "Help":
                     {
                         Console.WriteLine($"Help command received from {msg.From.Address}");
 
                         string body = "Commands:\n";
                         body += "GetIP - Get IP Addresses\n";
-
+					body += "Reset - Reset the connection\n";
                         SendMessage(body, msg.From.Address);
                     }
                     break;
