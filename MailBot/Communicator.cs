@@ -160,6 +160,10 @@ namespace MailBot
                         {
                             Point p = Controller.GetResolution();
                             SendMessage($"GetResolution:{p.X},{p.Y}");
+
+                            int x = int.Parse(resp.Split(':')[1].Split(',')[0]);
+                            int y = int.Parse(resp.Split(':')[1].Split(',')[1]);
+                            targetRes = new Point(x, y);
                         }
                         break;
                 }
@@ -214,7 +218,8 @@ namespace MailBot
 
             while (true)
             {
-                cRes = SendMessageAndWait("GetResolution?", out dummy);
+                Point res = Controller.GetResolution();
+                cRes = SendMessageAndWait($"GetResolution?:{res.X},{res.Y}", out dummy);
                 if (cRes.StartsWith("GetResolution:"))
                 {
                     int x = int.Parse(cRes.Split(':')[1].Split(',')[0]);
