@@ -8,6 +8,8 @@ using System.Net;
 using System.Net.Mail;
 using System.Threading;
 using System.Diagnostics;
+using System.Windows.Forms;
+using System.Windows;
 
 namespace MailBot
 {
@@ -86,8 +88,15 @@ namespace MailBot
                     break;
 			case "Reset":
 				{
-					Process.Start (System.Reflection.Assembly.GetExecutingAssembly ().Location);
-					Environment.Exit (0);
+					switch (PlatformInfo.RunningPlatform ()) {
+					case Platform.Linux:
+						Application.Restart ();
+						break;
+					case Platform.Windows:
+						Process.Start (Application.ExecutablePath );
+						Environment.Exit (0);
+						break;
+					}
 				}
 				break;
                 case "Help":
