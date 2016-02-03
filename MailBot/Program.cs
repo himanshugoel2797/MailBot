@@ -33,9 +33,9 @@ namespace MailBot
             if (transmitMouse)
             {
                 if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Left)) com.SendClick(MouseButtons.Left);
-                
+
                 if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Right)) com.SendClick(MouseButtons.Right);
-                
+
                 if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Middle)) com.SendClick(MouseButtons.Middle);
 
             }
@@ -166,8 +166,11 @@ namespace MailBot
 
             com.ListenAsync();  //Start listening
 
-            f = new Form1();
-            Application.Run(f);
+            if (PlatformInfo.RunningPlatform() == Platform.Windows)
+            {
+                f = new Form1();
+                Application.Run(f);
+            }
 
             while (true)
             {
