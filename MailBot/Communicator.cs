@@ -19,7 +19,7 @@ namespace MailBot
 
         IPEndPoint targetEP;
 
-        Point targetRes = new Point(0, 0);
+        public Point targetRes = new Point(0, 0);
 
         private static byte[] eString(string msg)
         {

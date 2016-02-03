@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 namespace MailBot
 {
     public enum MouseButtons{
-        Left, Right, Middle, ScrollUp, ScrollDown, Back = 8, 
+        Left, Right, Middle, ScrollUp, ScrollDown, Back, Forward 
     }
 }

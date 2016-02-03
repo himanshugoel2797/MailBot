@@ -16,7 +16,8 @@ namespace MailBot
         static Communicator com = null;
         static Point srcMousePos = new Point(0, 0);
         static Point dstMousePos = new Point(0, 0);
-        static Form f;
+        static Form1 f;
+        static string targetDir = "";
 
         internal static void RegisterEvents()
         {
@@ -25,6 +26,7 @@ namespace MailBot
             m_events.MouseUpExt += M_events_MouseDownExt;
             m_events.MouseMoveExt += M_events_MouseMove;
             m_events.MouseClick += M_events_MouseClick;
+            m_events.MouseWheelExt += M_events_MouseDownExt;
             m_events.MouseWheelExt += M_events_MouseDownExt;
         }
 
@@ -46,13 +48,14 @@ namespace MailBot
             if (transmitMouse)
             {
                 com.SendMove(e.X, e.Y);
+                f.SetColor();
                 f.Location = new Point(e.X - f.Width / 2, e.Y - f.Height / 2);
             }
         }
 
         static void M_events_MouseDownExt(object sender, MouseEventExtArgs e)
         {
-            if (e.Button == (System.Windows.Forms.MouseButtons.XButton2) && e.IsMouseButtonDown)
+            if (e.X <= 50 && e.Y <= 50 && e.Button == System.Windows.Forms.MouseButtons.XButton2)
             {
                 e.Handled = true;
                 transmitMouse = !transmitMouse;
@@ -89,7 +92,29 @@ namespace MailBot
                 if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Middle) && e.IsMouseButtonDown) com.SendDown(MouseButtons.Middle);
                 if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Middle) && (e.IsMouseButtonUp | e.Clicked)) com.SendUp(MouseButtons.Middle);
 
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.XButton1) && e.IsMouseButtonDown) com.SendDown(MouseButtons.Back);
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.XButton1) && (e.IsMouseButtonUp | e.Clicked)) com.SendUp(MouseButtons.Back);
 
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.XButton2) && e.IsMouseButtonDown) com.SendDown(MouseButtons.Forward);
+                if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.XButton2) && (e.IsMouseButtonUp | e.Clicked)) com.SendUp(MouseButtons.Forward);
+
+                int ticks = Math.Abs(e.Delta);
+
+
+                if (e.Delta < 0)
+                {
+                    for (int i = e.Delta; i < 0; i += 120)
+                    {
+                        com.SendClick(MouseButtons.ScrollDown);
+                    }
+                }
+                else if (e.Delta > 0)
+                {
+                    for (int i = 0; i < e.Delta; i += 120)
+                    {
+                        com.SendClick(MouseButtons.ScrollUp);
+                    }
+                }
             }
         }
 
@@ -111,6 +136,7 @@ namespace MailBot
                     if (args[1] != "") Console.WriteLine("Invalid Input.");
                     Console.WriteLine("active area on top/bottom/left/right?");
                     args[1] = Console.ReadLine();
+                    targetDir = args[1];
                 }
 
                 if (args[0] == "server")
@@ -172,11 +198,7 @@ namespace MailBot
                 Application.Run(f);
             }
 
-            while (true)
-            {
-                Console.ReadLine();
-                com.SendClick(MouseButtons.Right);
-            }
+            while (true) ;
 
         }
     }

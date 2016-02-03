@@ -106,6 +106,8 @@ namespace MailBot
             else if (b == MouseButtons.Right && !down) MouseEvent(MouseEventFlags.RightUp);
             else if (b == MouseButtons.Back && down) MouseEvent(MouseEventFlags.XDown, 1);
             else if (b == MouseButtons.Back && !down) MouseEvent(MouseEventFlags.XUp, 1);
+            else if (b == MouseButtons.Forward && down) MouseEvent(MouseEventFlags.XDown, 2);
+            else if (b == MouseButtons.Forward && !down) MouseEvent(MouseEventFlags.XUp, 2);
             else if (b == MouseButtons.ScrollUp) MouseEvent(MouseEventFlags.Wheel, 1);
             else if (b == MouseButtons.ScrollDown) MouseEvent(MouseEventFlags.Wheel, -1);
 
