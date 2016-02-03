@@ -54,6 +54,53 @@ namespace MailBot
             return new Random(BitConverter.ToInt32(srcAddr.GetAddressBytes(), 0));
         }
 
+
+        public void SendClick(MouseButtons button)
+        {
+            SendMessage($"Click:{button}");
+        }
+
+        public void SendMove(int x, int y)
+        {
+            SendMessage($"Move: {x},{y}");
+        }
+
+        public void ListenAsync()
+        {
+            AsyncCallback callback = null;
+            callback = new AsyncCallback((IAsyncResult e) =>
+            {
+                if (e.IsCompleted)
+                {
+                    IPEndPoint ep = new IPEndPoint(IPAddress.Any, clientPort);
+                    string msg = eString(client.EndReceive(e, ref ep));
+
+                    while (true)
+                    {
+                        switch (msg.Split(':')[0])
+                        {
+                            case "Click":
+                                Controller.SendMouseEvent((MouseButtons)Enum.Parse(typeof(MouseButtons), msg.Split(':')[1]), true);
+                                System.Threading.Thread.Sleep(1);
+                                Controller.SendMouseEvent((MouseButtons)Enum.Parse(typeof(MouseButtons), msg.Split(':')[1]), false);
+                                break;
+                            case "Move":
+                                {
+                                    int x = int.Parse(msg.Split(':')[1].Split(',')[0]);
+                                    int y = int.Parse(msg.Split(':')[1].Split(',')[1]);
+                                    Controller.MoveCursor(x, y);
+                                }
+                                break;
+                        }
+
+                        msg = ReceiveMessage(out ep);
+                    }
+                }
+            });
+
+            client.BeginReceive(callback, null);
+        }
+
         //Client constructor
         public Communicator(string dstAddr)
         {

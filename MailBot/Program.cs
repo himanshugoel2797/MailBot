@@ -68,20 +68,26 @@ namespace MailBot
 
             }
 
-            System.Threading.Thread.Sleep(1000);
-            Controller.MoveCursor(25, 110);
-            Controller.SendMouseEvent(MouseButtons.Left, true);
-            System.Threading.Thread.Sleep(1);
-            Controller.SendMouseEvent(MouseButtons.Left, false);
-
             if (args[0] == "server") new SMTPSys(args[2], args[3]);
 
-            Communicator com;
+            Communicator com = null;
 
             if (args[0] == "server") com = new Communicator();
             else if (args[0] == "client") com = new Communicator(args[2]);
 
-            while (true) ;
+            if (com == null)
+            {
+                Console.WriteLine("Invalid Arguments");
+                return;
+            }
+
+            com.ListenAsync();  //Start listening
+
+            while (true)
+            {
+                Console.ReadLine();
+                com.SendClick(MouseButtons.Right);
+            }
 
         }
     }
