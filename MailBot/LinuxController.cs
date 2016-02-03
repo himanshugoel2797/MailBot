@@ -11,20 +11,20 @@ namespace MailBot
 {
     static class LinuxController
     {
-		[DllImport("libXtst.so")]
-		static extern int XTestFakeButtonEvent(IntPtr dsp, uint button, bool isPress, ulong delay);
+        [DllImport("libXtst.so")]
+        static extern int XTestFakeButtonEvent(IntPtr dsp, uint button, bool isPress, ulong delay);
 
-		[DllImport("libXtst.so")]
-		static extern int XTestFakeMotionEvent(IntPtr dsp, int screen_number, int x, int y, ulong delay);
+        [DllImport("libXtst.so")]
+        static extern int XTestFakeMotionEvent(IntPtr dsp, int screen_number, int x, int y, ulong delay);
 
         static XDisplay dsp;
         static XWindow root_window;
 
-		static LinuxController()
-		{
-			dsp = new XDisplay (null);
-			root_window = new XWindow (dsp);
-		}
+        static LinuxController()
+        {
+            dsp = new XDisplay(null);
+            root_window = new XWindow(dsp);
+        }
 
         public static void MoveCursor(int x, int y)
         {
@@ -45,26 +45,31 @@ namespace MailBot
             return new Point(d.root_x, d.root_y);
         }
 
-		public static void SendMouseEvent(MouseButtons mouseButton, bool down)
+        public static void SendMouseEvent(MouseButtons mouseButton, bool down)
         {
-			XPointer p = new XPointer (dsp);
-			var pQinfo = p.Query (root_window);
+            XPointer p = new XPointer(dsp);
+            var pQinfo = p.Query(root_window);
 
-			XButtonEvent b = new XButtonEvent ();
+            XButtonEvent b = new XButtonEvent();
 
-			b.root = pQinfo.root;
-			b.window = pQinfo.child;
-			b.x_root = pQinfo.root_x;
-			b.y_root = pQinfo.root_y;
-			b.x = pQinfo.win_x;
-			b.y = pQinfo.win_y;
-			b.state = pQinfo.mask;
+            b.root = pQinfo.root;
+            b.window = pQinfo.child;
+            b.x_root = pQinfo.root_x;
+            b.y_root = pQinfo.root_y;
+            b.x = pQinfo.win_x;
+            b.y = pQinfo.win_y;
+            b.state = pQinfo.mask;
 
-			uint i = (uint)LinuxEnumConverter.E(mouseButton);
+            uint i = (uint)LinuxEnumConverter.E(mouseButton);
 
-			XTestFakeButtonEvent (dsp.Handle, i, down,  0);
+            XTestFakeButtonEvent(dsp.Handle, i, down, 0);
 
-			dsp.Flush ();
+            dsp.Flush();
+        }
+
+        public static Point GetResolution()
+        {
+            return new Point(dsp.XRes(), dsp.YRes());
         }
 
     }

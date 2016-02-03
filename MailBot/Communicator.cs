@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -18,6 +19,7 @@ namespace MailBot
 
         IPEndPoint targetEP;
 
+        Point targetRes = new Point(0, 0);
 
         private static byte[] eString(string msg)
         {
@@ -116,9 +118,11 @@ namespace MailBot
             Random rng = GetIPRandom();
             int key = rng.Next();
 
+            string resp = "";
+
             while (true)
             {
-                string resp = SendMessageAndWait($"Shake:{key}", out servEP);
+                resp = SendMessageAndWait($"Shake:{key}", out servEP);
                 if (resp.StartsWith("Shakeback:"))
                 {
                     try
@@ -140,6 +144,26 @@ namespace MailBot
 
             //At this point the client has successfully connected to the server
             Console.WriteLine("Connection Established");
+
+            bool commence = false;
+            while (!commence)
+            {
+                resp = ReceiveMessage(out servEP);
+
+                string cmd = resp.Split(':')[0];
+                switch (cmd)
+                {
+                    case "Commence":
+                        commence = true;
+                        break;
+                    case "GetResolution?":
+                        {
+                            Point p = Controller.GetResolution();
+                            SendMessage($"GetResolution:{p.X},{p.Y}");
+                        }
+                        break;
+                }
+            }
         }
 
         //Server constructor
@@ -180,6 +204,32 @@ namespace MailBot
                     }
                 }
             }
+
+            //Set cursor positions
+            IPEndPoint dummy = new IPEndPoint(IPAddress.Any, 0);
+
+            SendMove(0, 0);
+            Controller.MoveCursor(0, 0);
+            string cRes = "";
+
+            while (true)
+            {
+                cRes = SendMessageAndWait("GetResolution?", out dummy);
+                if (cRes.StartsWith("GetResolution:"))
+                {
+                    int x = int.Parse(cRes.Split(':')[1].Split(',')[0]);
+                    int y = int.Parse(cRes.Split(':')[1].Split(',')[1]);
+                    targetRes = new Point(x, y);
+
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid Response, Retrying");
+                }
+            }
+
+            SendMessage("Commence");
 
             //At this point the server has successfully connected to the client
             Console.WriteLine("Connection Established");

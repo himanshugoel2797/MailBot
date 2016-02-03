@@ -103,5 +103,10 @@ namespace MailBot
             else if (b == MouseButtons.Right && !down) MouseEvent(MouseEventFlags.RightUp);
 
         }
+
+        public static Point GetResolution()
+        {
+            return (Point)Screen.PrimaryScreen.Bounds.Size;
+        }
     }
 }
