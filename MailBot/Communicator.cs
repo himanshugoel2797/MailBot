@@ -116,15 +116,15 @@ namespace MailBot
                         if (msg.StartsWith("ShakebackAccepted:"))
                         {
                             int sKey = int.Parse(msg.Split(':')[1]);
-                            if (sKey != key) throw new Exception();
+                            if (sKey != key) throw new Exception("Warning: Invalid Handshake received, Ignored");
 
                             SendMessage("ConnectionAccepted");
                             break;
                         }
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        Console.WriteLine("Warning: Invalid Handshake received, Ignored");
+                        Console.WriteLine(e.Message);
                     }
                 }
             }
