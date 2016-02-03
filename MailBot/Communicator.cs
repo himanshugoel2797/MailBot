@@ -48,6 +48,12 @@ namespace MailBot
             return ReceiveMessage(out ep);
         }
 
+        private Random GetIPRandom()
+        {
+            IPAddress srcAddr = Dns.GetHostAddresses(Dns.GetHostName())[0];
+            return new Random(BitConverter.ToInt32(srcAddr.GetAddressBytes(), 0));
+        }
+
         //Client constructor
         public Communicator(string dstAddr)
         {
@@ -60,8 +66,33 @@ namespace MailBot
             client = new UdpClient(serverPort);
             IPEndPoint servEP = new IPEndPoint(IPAddress.Any, serverPort);
 
-            string resp = SendMessageAndWait($"Shake:{Dns.GetHostAddresses(Dns.GetHostName())[0]}", out servEP);
+            Random rng = GetIPRandom();
+            int key = rng.Next();
 
+            while (true)
+            {
+                string resp = SendMessageAndWait($"Shake:{key}", out servEP);
+                if (resp.StartsWith("Shakeback:"))
+                {
+                    try
+                    {
+                        int cKey = int.Parse(resp.Split(':')[1].Split(',')[0]);
+                        if (cKey != key) throw new Exception("Bad Handshake received, trying handshake again");
+
+                        int sKey = int.Parse(resp.Split(':')[1].Split(',')[1]);
+                        resp = SendMessageAndWait($"ShakebackAccepted:{sKey}", out servEP);
+
+                        if (resp == "ConnectionAccepted") break;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+            }
+
+            //At this point the client has successfully connected to the server
+            Console.WriteLine("Connection Established");
         }
 
         //Server constructor
@@ -70,12 +101,36 @@ namespace MailBot
             client = new UdpClient(clientPort);
             IPEndPoint clientEP = new IPEndPoint(IPAddress.Any, clientPort);
 
-            string msg = ReceiveMessage(out clientEP);
-            if (msg.StartsWith("Shake"))
+            while (true)
             {
-                msg = msg.Replace("Shake:", string.Empty);
-                if (IPAddress.Parse(msg) != clientEP.Address) Console.WriteLine("Bad handshake");
+                string msg = ReceiveMessage(out clientEP);
+                if (msg.StartsWith("Shake:"))
+                {
+                    try
+                    {
+                        int key = int.Parse(msg.Split(':')[1]);
+
+                        Random rng = GetIPRandom();
+                        msg = SendMessageAndWait($"Shakeback:{key},{rng.Next()}", out clientEP);
+
+                        if (msg.StartsWith("ShakebackAccepted:"))
+                        {
+                            int sKey = int.Parse(msg.Split(':')[1]);
+                            if (sKey != key) throw new Exception();
+
+                            SendMessage("ConnectionAccepted");
+                            break;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Warning: Invalid Handshake received, Ignored");
+                    }
+                }
             }
+
+            //At this point the server has successfully connected to the client
+            Console.WriteLine("Connection Established");
         }
 
     }
