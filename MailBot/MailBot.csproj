@@ -51,6 +51,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Communicator.cs" />
     <Compile Include="DetectPlatform.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="LinuxController.cs" />

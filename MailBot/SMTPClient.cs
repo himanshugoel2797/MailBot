@@ -43,7 +43,6 @@ namespace MailBot
             ic.NewMessage += Ic_NewMessage;
 
             Console.WriteLine("Monitoring for commands...");
-            while (true) ;
         }
 
         private void SendMessage(string body, string destAddr)
