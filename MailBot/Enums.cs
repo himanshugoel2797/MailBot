@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MailBot
 {
-    enum MouseButtons{
-        Left, Right, Button3, Button4, Button5
+    public enum MouseButtons{
+        Left, Right, Middle, Button4, Scroll
     }
 }

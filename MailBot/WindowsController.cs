@@ -20,5 +20,10 @@ namespace MailBot
         {
             return Cursor.Position;
         }
+
+		public static void SendMouseEvent(MouseButtons b, bool doubleClick)
+		{
+
+		}
     }
 }

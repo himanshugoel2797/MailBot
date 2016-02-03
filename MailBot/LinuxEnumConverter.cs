@@ -15,13 +15,13 @@ namespace MailBot
             {
                 case MouseButtons.Left:
                     return XMouseButton.Button1;
-                case MouseButtons.Right:
+                case MouseButtons.Middle:
                     return XMouseButton.Button2;
-                case MouseButtons.Button3:
+                case MouseButtons.Right:
                     return XMouseButton.Button3;
                 case MouseButtons.Button4:
                     return XMouseButton.Button4;
-                case MouseButtons.Button5:
+                case MouseButtons.Scroll:
                     return XMouseButton.Button5;
             }
 
