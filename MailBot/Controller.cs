@@ -30,14 +30,14 @@ namespace MailBot
 			}
 		}
 
-		public static void SendMouseEvent(MouseButtons b, bool doubleClick)
+		public static void SendMouseEvent(MouseButtons b, bool down)
 		{
 			switch (PlatformInfo.RunningPlatform ()) {
 			case Platform.Linux:
-				LinuxController.SendMouseEvent(b, doubleClick);
+				LinuxController.SendMouseEvent(b, down);
 				break;
 			case Platform.Windows:
-				WindowsController.SendMouseEvent(b, doubleClick);
+				WindowsController.SendMouseEvent(b, down);
 				break;
 			default:
 				throw new PlatformNotSupportedException ();

@@ -45,7 +45,7 @@ namespace MailBot
             return new Point(d.root_x, d.root_y);
         }
 
-		public static void SendMouseEvent(MouseButtons mouseButton, bool doubleClick)
+		public static void SendMouseEvent(MouseButtons mouseButton, bool down)
         {
 			XPointer p = new XPointer (dsp);
 			var pQinfo = p.Query (root_window);
@@ -62,13 +62,7 @@ namespace MailBot
 
 			uint i = (uint)LinuxEnumConverter.E(mouseButton);
 
-			XTestFakeButtonEvent (dsp.Handle, i, true,  0);
-			XTestFakeButtonEvent (dsp.Handle, i, false, 100);
-
-			if (doubleClick) {
-				XTestFakeButtonEvent (dsp.Handle, i, true,  200);
-				XTestFakeButtonEvent (dsp.Handle, i, false, 300);
-			}
+			XTestFakeButtonEvent (dsp.Handle, i, down,  0);
 
 			dsp.Flush ();
         }
